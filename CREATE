@@ -1,0 +1,156 @@
+CREATE TABLE Archer(
+    Archer_ID int(20) AUTO_INCREMENT,
+    First_Name varchar(20) NOT NULL,
+    Last_Name varchar(20) NOT NULL,
+    Gender ENUM('Male', 'Female') NOT NULL,
+    Age int(2) NOT NULL,
+    Email varchar(255) UNIQUE NOT NULL,
+    Pass_word varchar(255) NOT NULL,
+    PRIMARY KEY (Archer_ID),
+    CONSTRAINT valid_email CHECK (Email LIKE '%_@__%.__%')
+);
+
+CREATE TABLE Class(
+    Class_ID int(2) AUTO_INCREMENT,
+    Class_Age varchar(5) NOT NULL,
+    Min_Max ENUM('Min', 'Max') DEFAULT 'Min',
+    Class_Gender ENUM('Male', 'Female') NOT NULL,
+    PRIMARY KEY (Class_ID),
+    #Added Unique Constraint to prevent input of the already existed class
+    CONSTRAINT UC_Class UNIQUE (Class_Age, Min_Max, Class_Gender)
+);
+
+CREATE TABLE Championship(
+    Championship_ID int(3) AUTO_INCREMENT,
+    Championship_Name TEXT,
+    Championship_Desc TEXT,
+    Championship_Start_Date date,
+    Championship_End_Date date,
+    PRIMARY KEY (Championship_ID),
+    #Added Unique Constraint to prevent input of the already existed champion
+    CONSTRAINT UC_Championship UNIQUE (Championship_Name(255), Championship_Start_Date, Championship_End_Date)
+);
+ 
+CREATE TABLE Equipment(
+    Equipment_ID int(2) AUTO_INCREMENT,
+    Equipment_Desc TEXT,
+    PRIMARY KEY (Equipment_ID),
+    #Added Unique Constraint to prevent input of the already existed equipment
+    CONSTRAINT UC_Equipment UNIQUE (Equipment_Desc(255))
+);
+
+
+CREATE TABLE Rounds(
+    Round_ID varchar(20) NOT NULL,
+    Class_ID int(2),
+    Equipment_ID int(2),
+    PRIMARY KEY (Round_ID),
+    #Added Unique Constraint to prevent input of the already existed round
+    CONSTRAINT UC_Rounds UNIQUE (Round_ID, Class_ID, Equipment_ID),
+    CONSTRAINT FK_Class FOREIGN KEY (Class_ID) REFERENCES Class(Class_ID),
+    CONSTRAINT FK_Equipment FOREIGN KEY (Equipment_ID) REFERENCES Equipment(Equipment_ID)
+);
+
+CREATE TABLE Ranges(
+    Range_ID varchar(20) NOT NULL,
+    Range_Distance ENUM('10', '20', '30', '40', '50', '60', '70', '90') NOT NULL,
+    Face_Size ENUM('80', '122') DEFAULT '80',
+    Number_Of_Ends int(1) NOT NULL,
+    PRIMARY KEY (Range_ID),
+    #Added Unique Constraint to prevent input of the already existed range
+    CONSTRAINT UC_Range UNIQUE (Range_Distance, Face_Size, Number_Of_Ends)
+);
+
+CREATE TABLE Competition(
+    Competition_ID int(3) AUTO_INCREMENT,
+    Competition_Date date NOT NULL,
+    Competition_Name TEXT,
+    Round_ID varchar(20),
+    Championship_ID int(3),
+    PRIMARY KEY (Competition_ID),
+    #Added Unique Constraint to prevent input of the already existed competition
+    CONSTRAINT UC_Competition UNIQUE (Competition_Date, Competition_Name(255), Round_ID, Championship_ID),
+    CONSTRAINT FK_RoundComp FOREIGN KEY (Round_ID) REFERENCES Rounds(Round_ID),
+    CONSTRAINT FK_Championship FOREIGN KEY (Championship_ID) REFERENCES Championship(Championship_ID)
+);
+
+CREATE TABLE RangeRoundCompetition(
+    Score_ID int(20) AUTO_INCREMENT,
+    Competition_ID int(3),
+    Range_Count varchar(2) NOT NULL,
+    Round_ID varchar(20),
+    Range_ID varchar(20),
+    PRIMARY KEY (Score_ID),
+    CONSTRAINT UC_Competition_Range UNIQUE (Competition_ID, Range_Count),
+    CONSTRAINT FK_Competition_ID FOREIGN KEY (Competition_ID) REFERENCES Competition(Competition_ID),
+    CONSTRAINT FK_Round FOREIGN KEY (Round_ID) REFERENCES Competition(Round_ID),
+    CONSTRAINT FK_Range FOREIGN KEY (Range_ID) REFERENCES Ranges(Range_ID)
+);
+
+
+CREATE TRIGGER auto_insert_round_id
+BEFORE INSERT ON RangeRoundCompetition
+FOR EACH ROW
+BEGIN
+    DECLARE roundIdValue VARCHAR(20);
+    
+    -- Retrieve the Round_ID associated with the Competition_ID being inserted
+    SELECT Round_ID INTO roundIdValue
+    FROM Competition
+    WHERE Competition_ID = NEW.Competition_ID;
+
+    -- Set the Round_ID for the new row being inserted
+    SET NEW.Round_ID = roundIdValue;
+END;
+
+
+
+CREATE TABLE ArcherScore (
+    Archer_ID int(20),
+    Score_ID int(20),
+    End_No int(1),
+    Arrow_No_1 ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'X', 'M'),
+    Arrow_No_2 ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'X', 'M'),
+    Arrow_No_3 ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'X', 'M'),
+    Arrow_No_4 ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'X', 'M'),
+    Arrow_No_5 ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'X', 'M'),
+    Arrow_No_6 ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'X', 'M'),
+    End_Score int(2) AS (
+        CASE Arrow_No_1
+            WHEN 'X' THEN 10
+            WHEN 'M' THEN 0
+            ELSE CAST(Arrow_No_1 AS SIGNED) 
+            #Index value of ENUM starts from 1, so '0' will be treated as '1'
+        END +
+        CASE Arrow_No_2
+            WHEN 'X' THEN 10
+            WHEN 'M' THEN 0
+            ELSE CAST(Arrow_No_2 AS SIGNED) 
+        END +
+        CASE Arrow_No_3
+            WHEN 'X' THEN 10
+            WHEN 'M' THEN 0
+            ELSE CAST(Arrow_No_3 AS SIGNED) 
+        END +
+        CASE Arrow_No_4
+            WHEN 'X' THEN 10
+            WHEN 'M' THEN 0
+            ELSE CAST(Arrow_No_4 AS SIGNED) 
+        END +
+        CASE Arrow_No_5
+            WHEN 'X' THEN 10
+            WHEN 'M' THEN 0
+            ELSE CAST(Arrow_No_5 AS SIGNED) 
+        END +
+        CASE Arrow_No_6
+            WHEN 'X' THEN 10
+            WHEN 'M' THEN 0
+            ELSE CAST(Arrow_No_6 AS SIGNED) 
+        END
+    ),
+    Verified BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (Archer_ID, Score_ID, End_No),
+    CONSTRAINT FK_ArcherScore FOREIGN KEY (Archer_ID) REFERENCES Archer(Archer_ID),
+    CONSTRAINT FK_Score FOREIGN KEY (Score_ID) REFERENCES RangeRoundCompetition(Score_ID)
+);
+
