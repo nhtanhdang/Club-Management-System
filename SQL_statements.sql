@@ -154,7 +154,7 @@ CREATE TABLE ArcherScore (
     CONSTRAINT FK_Score FOREIGN KEY (Score_ID) REFERENCES RangeRoundCompetition(Score_ID)
 );
 
-//Retrieve the results of the National Archery Championship (2020) to identify the winner and his/her scores in each competition regarding to other participants' performance. This information provides a benchmark for future participants to strive towards and can serve as a point of reference for comparing and analysing individual performances.
+--Retrieve the results of the National Archery Championship (2020) to identify the winner and his/her scores in each competition regarding to other participants' performance. This information provides a benchmark for future participants to strive towards and can serve as a point of reference for comparing and analysing individual performances.
 
 SELECT a.Archer_ID, CONCAT(a.First_Name, ' ', a.Last_Name) AS Archer_Name, c.Championship_ID, c.Championship_Name, c.Championship_Start_Date, c.Championship_End_Date, comp.Competition_ID, comp.Competition_Date, rrc.Round_ID,
     comp_scores.Competition_Score, champ_scores.Championship_Score
@@ -191,7 +191,7 @@ WHERE c.Championship_ID = '1' AND comp.Competition_Date BETWEEN c.Championship_S
 GROUP BY a.Archer_ID, a.First_Name, a.Last_Name, c.Championship_ID, c.Championship_Name, c.Championship_Desc, c.Championship_Start_Date, c.Championship_End_Date, comp.Competition_ID, comp.Competition_Date, rrc.Round_ID, r.Class_ID, r.Equipment_ID
 ORDER BY champ_scores.Championship_Score DESC, comp_scores.X_Count DESC;
 
-//Retrieve the highest recorded score in each competition. By this, participants can set realistic and challenging goals for themselves in each competition. The best recorded score also serves as a reference point for participants to evaluate the level of challenge in a competition. It might be interpreted that if the best score is exceptionally low, the competition is more likely to be difficult, requiring participants to bring their best skills and strategies. Moreover, comparing the best recorded scores across different competitions allows participants to identify rounds of similar difficulty levels, helping them make informed decisions based on their skill level and preferences.
+--Retrieve the highest recorded score in each competition. By this, participants can set realistic and challenging goals for themselves in each competition. The best recorded score also serves as a reference point for participants to evaluate the level of challenge in a competition. It might be interpreted that if the best score is exceptionally low, the competition is more likely to be difficult, requiring participants to bring their best skills and strategies. Moreover, comparing the best recorded scores across different competitions allows participants to identify rounds of similar difficulty levels, helping them make informed decisions based on their skill level and preferences.
 
 SELECT outerquery.Competition_ID, outerquery.Competition_Date, outerquery.Competition_Name, outerquery.Round_ID, outerquery.Class_ID, outerquery.Equipment, outerquery.Archer_ID, outerquery.Archer_Name, outerquery.Round_Score
 FROM (
@@ -222,7 +222,7 @@ FROM (
 ) AS outerquery
 WHERE rn = 1;
 
-//Retrieve the list of archers who attend in Brisbane competition on February 14, 2020 and their individual competition score from highest to lowest.  By reviewing the individual competition scores, the club coaches and archers can assess their performance, identify areas for improvement, and track their progress over time. The list can also provide valuable statistical insights into the average performance between all participants in the 2020 Brisbane competition. 
+--Retrieve the list of archers who attend in Brisbane competition on February 14, 2020 and their individual competition score from highest to lowest.  By reviewing the individual competition scores, the club coaches and archers can assess their performance, identify areas for improvement, and track their progress over time. The list can also provide valuable statistical insights into the average performance between all participants in the 2020 Brisbane competition. 
 
 SELECT Archer_ID, Archer_Name, Competition_ID, Round_ID, Class_ID, Equipment_ID, Round_Score
 FROM (
@@ -244,7 +244,7 @@ FROM (
 ) AS subquery
 ORDER BY Round_Score DESC, X_Count DESC;
 
-//Retrieve the list all archers who are eligible to participate in all rounds for "50+ Male”. This information can be useful for event organisers, coaches, or participants themselves to ensure that only eligible archers are allowed to compete in rounds specifically designed for the "50+ Male" category. 
+--Retrieve the list all archers who are eligible to participate in all rounds for "50+ Male”. This information can be useful for event organisers, coaches, or participants themselves to ensure that only eligible archers are allowed to compete in rounds specifically designed for the "50+ Male" category. 
 
 SELECT a.Archer_ID, CONCAT(a.First_Name, ' ', a.Last_Name) AS Archer_Name, a.Age, a.Gender, c.Class_Gender, c.Class_Age AS Limit_Age
 FROM Archer a
@@ -256,7 +256,7 @@ WHERE c.Class_Gender = 'Male' AND c.Class_Age = '50' AND
     END
 ORDER BY a.Age ASC;
 
-//Recorders can verify the score that has been staged by archers. This is to enhance the data accuracy and credibility of the staged score. Below is the example of verifying the end score of archer Florence Last Kiara (ID: 26).
+--Recorders can verify the score that has been staged by archers. This is to enhance the data accuracy and credibility of the staged score. Below is the example of verifying the end score of archer Florence Last Kiara (ID: 26).
 
 SELECT rs.Archer_ID, CONCAT(a.First_Name, ' ', a.Last_Name) AS Archer_Name, rrc.Score_ID, rrc.Round_ID, rrc.Range_Count, rs.End_No, rs.End_Score, rs.Verified  
 FROM ArcherScore rs
@@ -270,7 +270,7 @@ WHERE Archer_ID = '26' AND Score_ID = '20' AND End_No = '4';
 
 SELECT * FROM ArcherScore WHERE Archer_ID = '26' AND Score_ID = '20' AND End_No = '4';
 
-//Retrieve list of competitions including both championship’s and independent competitions. Having a consolidated list of competitions helps in organising events or tournaments for better plan and management, identifying and avoiding clashes or overlaps between championships and independent competitions. Thus, the club can allocate resources effectively, and schedule events strategically.
+--Retrieve list of competitions including both championship’s and independent competitions. Having a consolidated list of competitions helps in organising events or tournaments for better plan and management, identifying and avoiding clashes or overlaps between championships and independent competitions. Thus, the club can allocate resources effectively, and schedule events strategically.
 
 SELECT c.Competition_ID, c.Competition_Date, c.Competition_Name, c.Round_ID, 
 CASE 
@@ -280,7 +280,7 @@ END AS Championship_Name
 FROM Competition c
 LEFT JOIN Championship ch ON ch.Championship_ID = c.Championship_ID;
 
-//Archer Jerry Sims (ID: 1) look up their scores sorted by the competition date and score in descending order. This helps in evaluating his performance over time and assessing his progress, identifying any patterns or trends, and understanding his strengths and weaknesses in different competitions.
+--Archer Jerry Sims (ID: 1) look up their scores sorted by the competition date and score in descending order. This helps in evaluating his performance over time and assessing his progress, identifying any patterns or trends, and understanding his strengths and weaknesses in different competitions.
 
  SELECT DISTINCT c.Competition_ID, c.Competition_Date, rrc.Round_ID, rrc.Range_ID, rrc.Range_Count, rs.Score_ID, rs.End_No,
   CONCAT(
@@ -295,7 +295,7 @@ JOIN Competition c ON rrc.Competition_ID = c.Competition_ID
 WHERE rs.Archer_ID = '1' AND rs.Verified = TRUE
 ORDER BY c.Competition_Date DESC, Round_Score DESC;
 
-//Archer Jerry Sims’s scores are restricted by date range and round ID. By limiting scores by date range, it becomes possible to analyse Jerry's performance within a particular timeframe. This can help in tracking his progress and identifying any trends or improvements in his scores during that time. On the other hand, restricting the scores by round ID allows for focusing on a specific type of round. This helps in evaluating Jerry's performance in a particular type of competition or round format, enabling a more targeted analysis to identify specific strengths or weaknesses in that particular round and make adjustments accordingly.
+--Archer Jerry Sims’s scores are restricted by date range and round ID. By limiting scores by date range, it becomes possible to analyse Jerry's performance within a particular timeframe. This can help in tracking his progress and identifying any trends or improvements in his scores during that time. On the other hand, restricting the scores by round ID allows for focusing on a specific type of round. This helps in evaluating Jerry's performance in a particular type of competition or round format, enabling a more targeted analysis to identify specific strengths or weaknesses in that particular round and make adjustments accordingly.
 
 SELECT DISTINCT c.Competition_ID, c.Competition_Date, rrc.Round_ID, rrc.Range_ID, rrc.Range_Count, rs.Score_ID, rs.End_No,
   CONCAT(
@@ -314,14 +314,14 @@ WHERE  rs.Archer_ID = '1'
   AND rs.Verified = TRUE
 ORDER BY c.Competition_Date DESC, Round_Score DESC;
 
-//Jerry can enter each of his arrow score and the system will auto-aggregate the list of arrow scores to return the total end score. Unless the recorder has verified Jerry’s staged score, the “Verified” attribute will be set to False (“0”).  
+--Jerry can enter each of his arrow score and the system will auto-aggregate the list of arrow scores to return the total end score. Unless the recorder has verified Jerry’s staged score, the “Verified” attribute will be set to False (“0”).  
 
 SELECT Round_ID, c.Class_Age, c.Class_Gender, e.Equipment_Desc 
 FROM Rounds
 JOIN Class c ON c.Class_ID = Rounds.Class_ID
 JOIN Equipment e ON e.Equipment_ID = Rounds.Equipment_ID;
 
-//For more detailed information of every round, archers can also retrieve the ranges that are held within a round. 
+--For more detailed information of every round, archers can also retrieve the ranges that are held within a round. 
 
 SELECT DISTINCT r.Round_ID, cl.Class_Age, cl.Min_Max, cl.Class_Gender, e.Equipment_Desc, rrc.Range_ID, c.Range_Distance, c.Number_Of_Ends, c.Face_Size,
        SUM(c.Number_Of_Ends) OVER (PARTITION BY r.Round_ID) AS Total_Number_Of_Ends
@@ -331,7 +331,7 @@ JOIN Equipment e ON r.Equipment_ID = e.Equipment_ID
 JOIN RangeRoundCompetition rrc ON r.Round_ID = rrc.Round_ID
 JOIN Ranges c ON rrc.Range_ID = c.Range_ID;
 
-//Archers can also find out equivalent rounds (i.e rounds with similar class). Hence, they can assess the transferability of their skills and performance across different rounds. They can determine if their performance in one round can be a reference point to assess the performance in another round with similar characteristics, thus, make informed decisions about participating in different rounds to maximise their performance. 
+--Archers can also find out equivalent rounds (i.e rounds with similar class). Hence, they can assess the transferability of their skills and performance across different rounds. They can determine if their performance in one round can be a reference point to assess the performance in another round with similar characteristics, thus, make informed decisions about participating in different rounds to maximise their performance. 
 
 SELECT r1.Round_ID AS Round_ID1, r2.Round_ID AS Round_ID2, c.Class_Gender, c.Class_Age, c.Min_Max
 FROM Rounds r1
@@ -339,7 +339,7 @@ JOIN Rounds r2 ON r1.Class_ID = r2.Class_ID
 JOIN Class c ON c.Class_ID = r1.Class_ID
 WHERE r1.Round_ID < r2.Round_ID; -- to return only one pair of rounds, excluding duplicates & reversing the order pairs
 
-//Archer Jerry Sim can look up for his best personal score among the rounds held at different times. This way Jerry can assess his strengths and weaknesses, understand what led to his highest performance, and determine strategies to replicate or surpass that performance in future rounds.
+--Archer Jerry Sim can look up for his best personal score among the rounds held at different times. This way Jerry can assess his strengths and weaknesses, understand what led to his highest performance, and determine strategies to replicate or surpass that performance in future rounds.
 
 SELECT subquery.*, MAX(Round_Score) AS Personal_Best_Score
 FROM (
@@ -355,7 +355,7 @@ FROM (
 GROUP BY Competition_ID, Round_ID, Round_Score
 ORDER BY Personal_Best_Score DESC;
 
-//Jerry can also look for his best performance among all rounds he has participated in. It allows him to understand his capabilities and achievements in a broader context, beyond individual rounds. This information helps him self-estimate his proficiency level and compare his performance against other archers.
+--Jerry can also look for his best performance among all rounds he has participated in. It allows him to understand his capabilities and achievements in a broader context, beyond individual rounds. This information helps him self-estimate his proficiency level and compare his performance against other archers.
 
 SELECT subquery.*
 FROM (
